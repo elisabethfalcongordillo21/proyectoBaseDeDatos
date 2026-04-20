@@ -1,0 +1,117 @@
+DROP DATABASE IF EXISTS PROYECTO;
+CREATE DATABASE PROYECTO;
+USE PROYECTO;
+
+CREATE TABLE usuario (
+    id_usuario INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(9) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    contraseña VARCHAR(200) NOT NULL,
+    email VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE empleado (
+    id_empleado INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(9) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    salario DECIMAL(10,2) UNSIGNED NOT NULL
+);
+
+CREATE TABLE cliente (
+    id_cliente INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    dni VARCHAR(9) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    estatus VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE producto (
+    id_producto INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(150) NOT NULL,
+    precio DECIMAL(10 , 2 ) UNSIGNED NOT NULL,
+    descripcion VARCHAR(1000) NOT NULL,
+    tipo ENUM('fisico', 'digital') NOT NULL
+);
+
+CREATE TABLE stock (
+    id_stock INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_producto INT UNSIGNED UNIQUE NOT NULL,
+    cantidad_stock INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE direccion (
+    id_direccion INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    cod_postal VARCHAR(10) NOT NULL,
+    calle VARCHAR(100) NOT NULL,
+    localidad VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE pedido (
+    id_pedido INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    fecha_pedido DATETIME NOT NULL,
+    fecha_entrega DATETIME NOT NULL,
+    id_cliente INT UNSIGNED NOT NULL,
+    id_direccion INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_direccion) REFERENCES direccion(id_direccion) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE pedido_producto (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT UNSIGNED NOT NULL,
+    id_producto INT UNSIGNED NOT NULL,
+    cantidad INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE usuario_pedido (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT UNSIGNED NOT NULL,
+    id_pedido INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE metodo_pago (
+    id_metodo INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('PayPal', 'Transferencia', 'Bizum', 'Contra_reembolso') NOT NULL,
+    id_pedido INT UNSIGNED UNIQUE NOT NULL,
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE reseña (
+    id_reseña INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    fecha_reseña DATETIME NOT NULL,
+    contenido VARCHAR(1000) NOT NULL,
+    puntuacion INT UNSIGNED NOT NULL,
+    id_cliente INT UNSIGNED NOT NULL,
+    id_producto INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_producto) REFERENCES producto(id_producto) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE incidencia (
+    id_incidencia INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    fecha_incidencia DATETIME NOT NULL,
+    descripcion VARCHAR(1000) NOT NULL,
+    estado VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE gestion_incidencia (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_empleado INT UNSIGNED NOT NULL,
+    id_incidencia INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_empleado) REFERENCES empleado(id_empleado) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_incidencia) REFERENCES incidencia(id_incidencia) ON DELETE CASCADE ON UPDATE RESTRICT
+);
+
+CREATE TABLE cliente_incidencia (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT UNSIGNED NOT NULL,
+    id_incidencia INT UNSIGNED NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente) ON DELETE CASCADE ON UPDATE RESTRICT,
+    FOREIGN KEY (id_incidencia) REFERENCES incidencia(id_incidencia) ON DELETE CASCADE ON UPDATE RESTRICT
+);
