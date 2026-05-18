@@ -1,0 +1,106 @@
+use proyecto;
+-- procedimientos 
+
+-- 1-Listar pedidos de un cliente por su nombre
+DELIMITER ##
+DROP PROCEDURE IF EXISTS listar_pedidos_cliente##
+CREATE PROCEDURE listar_pedidos_cliente(IN nombre_cli VARCHAR(100))
+BEGIN
+    SELECT
+        p.id_pedido,
+        p.fecha_pedido,
+        p.fecha_entrega
+    FROM pedido p
+    INNER JOIN cliente c ON p.id_cliente = c.id_cliente
+    WHERE c.nombre = nombre_cli;
+END
+## 
+DELIMITER ;
+
+-- 2-Contar incidencias por estado
+DELIMITER ##
+DROP PROCEDURE IF EXISTS contar_incidencias_estado##
+CREATE PROCEDURE contar_incidencias_estado(
+    IN estado_inc VARCHAR(20),
+    OUT total INT UNSIGNED
+)
+BEGIN
+    SELECT COUNT(*)
+    INTO total
+    FROM incidencia
+    WHERE estado = estado_inc;
+END
+##
+DELIMITER ;
+
+-- 3- Estadísticas de precios por tipo de producto
+DELIMITER ##
+DROP PROCEDURE IF EXISTS estadisticas_precios_tipo##
+CREATE PROCEDURE estadisticas_precios_tipo(
+    IN tipo_prod VARCHAR(10),
+    OUT precio_maximo DECIMAL(10,2),
+    OUT precio_minimo DECIMAL(10,2),
+    OUT precio_medio DECIMAL(10,2)
+)
+BEGIN
+    SELECT
+        MAX(precio),
+        MIN(precio),
+        ROUND(AVG(precio), 2)
+    INTO precio_maximo, precio_minimo, precio_medio
+    FROM producto
+    WHERE tipo = tipo_prod;
+END
+## 
+DELIMITER ;
+
+-- 4-Actualizar el estado de una incidencia
+DELIMITER ##
+ 
+DROP PROCEDURE IF EXISTS actualizar_estado_incidencia##
+CREATE PROCEDURE actualizar_estado_incidencia(
+    IN id_inc INT,
+    IN nuevo_estado VARCHAR(20)
+)
+BEGIN
+    UPDATE incidencia
+    SET estado = nuevo_estado
+    WHERE id_incidencia = id_inc;
+ 
+    SELECT id_incidencia, descripcion, estado
+    FROM incidencia
+    WHERE id_incidencia = id_inc;
+END
+##
+DELIMITER ;
+
+-- 5-Buscar productos por tipo y stock mínimo
+DELIMITER ##
+ 
+DROP PROCEDURE IF EXISTS buscar_productos_stock##
+CREATE PROCEDURE buscar_productos_stock(
+    IN tipo_prod VARCHAR(10),
+    IN stock_minimo INT,
+    OUT total INT UNSIGNED
+)
+BEGIN
+    SELECT COUNT(*)
+    INTO total
+    FROM producto pr
+    INNER JOIN stock s ON pr.id_producto = s.id_producto
+    WHERE pr.tipo = tipo_prod
+    AND s.cantidad_stock >= stock_minimo;
+ 
+    SELECT pr.nombre, pr.precio, s.cantidad_stock
+    FROM producto pr
+    INNER JOIN stock s ON pr.id_producto = s.id_producto
+    WHERE pr.tipo = tipo_prod
+    AND s.cantidad_stock >= stock_minimo;
+END
+##
+ 
+DELIMITER ;
+
+
+
+
