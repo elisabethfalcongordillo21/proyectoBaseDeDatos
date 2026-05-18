@@ -1,0 +1,55 @@
+use proyecto;
+-- vistas
+-- 1-Pedidos con nombre del cliente 
+CREATE VIEW vista_resumen_pedidos AS
+SELECT
+    p.id_pedido,
+    p.fecha_pedido,
+    p.fecha_entrega,
+    c.nombre AS cliente,
+    c.tipo AS tipo_cliente
+FROM pedido p
+INNER JOIN cliente c ON p.id_cliente = c.id_cliente;
+
+-- 2-Catálogo de productos con stock
+CREATE VIEW vista_catalogo_productos AS
+SELECT
+    pr.id_producto,
+    pr.nombre,
+    pr.tipo,
+    pr.precio,
+    pr.descripcion,
+    s.cantidad_stock
+FROM producto pr
+INNER JOIN stock s ON pr.id_producto = s.id_producto;
+
+-- 3-Clientes activos
+CREATE  VIEW vista_clientes_activos AS
+SELECT
+    id_cliente,
+    nombre,
+    telefono,
+    tipo
+FROM cliente
+WHERE estatus = 'Activo';
+
+-- 4-Incidencias pendientes
+CREATE  VIEW vista_incidencias_pendientes AS
+SELECT
+    id_incidencia,
+    fecha_incidencia,
+    descripcion,
+    estado
+FROM incidencia
+WHERE estado = 'Pendiente';
+
+-- 5-Reseñas con nombre del producto
+CREATE  VIEW vista_resenas_productos AS
+SELECT
+    r.contenido,
+    r.puntuacion,
+    r.fecha_reseña,
+    pr.nombre AS producto,
+    pr.tipo AS tipo_producto
+FROM reseña r
+INNER JOIN producto pr ON r.id_producto = pr.id_producto;
