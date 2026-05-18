@@ -1,0 +1,98 @@
+use proyecto;
+-- funciones
+
+-- 1-Contar los pedidos de un cliente
+DELIMITER ##
+DROP FUNCTION IF EXISTS contar_pedidos_cliente##
+CREATE FUNCTION contar_pedidos_cliente(id_cli INT)
+RETURNS INT UNSIGNED
+DETERMINISTIC
+BEGIN
+    DECLARE total INT UNSIGNED;
+    SELECT COUNT(*)
+    INTO total
+    FROM pedido
+    WHERE id_cliente = id_cli;
+    RETURN total;
+END
+##
+ 
+DELIMITER ;
+
+-- 2-Calcular la puntuación media de un producto
+DELIMITER ##
+DROP FUNCTION IF EXISTS media_puntuacion_producto##
+CREATE FUNCTION media_puntuacion_producto(id_prod INT)
+RETURNS DECIMAL(4,2)
+DETERMINISTIC
+BEGIN
+   DECLARE media DECIMAL(4,2);
+    SELECT ROUND(AVG(puntuacion), 2)
+    INTO media
+    FROM reseña
+    WHERE id_producto = id_prod;
+    RETURN media;
+END
+##
+DELIMITER ;
+
+-- 3-Obtener el stock disponible de un producto
+DELIMITER ##
+DROP FUNCTION IF EXISTS obtener_stock_producto##
+CREATE FUNCTION obtener_stock_producto(id_prod INT)
+RETURNS INT UNSIGNED
+DETERMINISTIC
+BEGIN
+  DECLARE cantidad INT UNSIGNED;
+    SELECT cantidad_stock
+    INTO cantidad
+    FROM stock
+    WHERE id_producto = id_prod;
+    RETURN cantidad;
+END
+##
+DELIMITER ;
+
+-- 4-Comprobar si un cliente tiene incidencias activas
+DELIMITER ##
+DROP FUNCTION IF EXISTS tiene_incidencias_activas##
+CREATE FUNCTION tiene_incidencias_activas(id_cli INT)
+RETURNS VARCHAR(10)
+DETERMINISTIC
+BEGIN
+  DECLARE salario_emp DECIMAL(10,2);
+    DECLARE categoria VARCHAR(10);
+    SELECT salario
+    INTO salario_emp
+    FROM empleado
+    WHERE id_empleado = id_emp;
+    IF salario_emp > 1600 THEN
+        SET categoria = 'Alto';
+    ELSEIF salario_emp >= 1300 THEN
+        SET categoria = 'Medio';
+    ELSE
+        SET categoria = 'Bajo';
+    END IF;
+    RETURN categoria;
+END
+##
+DELIMITER ;
+
+-- 5-Calcular el salario anual de un empleado
+DELIMITER ##
+DROP FUNCTION IF EXISTS salario_anual_empleado##
+CREATE FUNCTION salario_anual_empleado(id_emp INT)
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+	DECLARE salario_mensual DECIMAL(10,2);
+    DECLARE salario_anual DECIMAL(10,2);
+    SELECT salario
+    INTO salario_mensual
+    FROM empleado
+    WHERE id_empleado = id_emp;
+    SET salario_anual = salario_mensual * 12;
+    RETURN salario_anual;
+END
+##
+DELIMITER ;
